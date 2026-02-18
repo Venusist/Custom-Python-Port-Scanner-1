@@ -1,0 +1,47 @@
+1. Haberleşme Kutusunu Getirmek (import socket)
+Tıpkı önceki kodda re modülünü getirdiğimiz gibi, bilgisayarların internet veya ağ üzerinden birbiriyle iletişim kurmasını sağlayan araçların bulunduğu Modülü (Module) projemize import ediyoruz. socket (soket), iki bilgisayarın birbiriyle konuşması için oluşturulan sanal kablo uçlarıdır.
+
+2. Telefon Rehberi (COMMON_PORTS = {...})
+ bir Sözlük (Dictionary) oluşturuyoruz. Sol taraftaki sayılar (anahtarlar/keys) port numaraları, sağ taraftakiler ise o kapının arkasında çalışan hizmetin adıdır (değerler/values).
+
+3. Tarama Fabrikasını Kurmak (def scan_ports(target, start_port, end_port):)
+Bir Fonksiyon (Function) tanımlıyoruz (define). İçine 3 tane boş koltuk, yani Parametre (Parameter) koyuyoruz: Hedef IP (target), başlama kapısı (start_port) ve bitiş kapısı (end_port). İlk satırda da print ile "Şu adresi, şu porttan şu porta kadar tarıyorum" diye bir bilgi mesajı yazdırıyoruz.
+
+4. Hedef Kapıları Sıraya Dizmek (for port in range(...))
+
+range() bir Fonksiyondur ve bize bir sayı aralığı üretir. Örneğin range(20, 25) bize sırasıyla 20, 21, 22, 23 ve 24 sayılarını verir. Son sayıyı dahil etmediği için kodda end_port + 1 yazıyoruz ki son kapıyı da tarasın.
+for port in ... diyerek bir Döngü (Loop) kuruyoruz. Yani "Bu sayı aralığındaki her bir sayıyı sırayla eline al ve o an elinde tuttuğun sayıya port adını ver" diyoruz. port burada bizim Değişkenimiz (Variable) oluyor.
+
+5. Bağlantı Kablosunu Yaratmak (s = socket.socket(...))
+s bizim belirlediğimiz bir Değişken (Variable) ismi. Tıpkı line veya file gibi.
+Burada Python'a şunu diyoruz: "Bana socket modülünün içinden bir soket nesnesi (kablo ucu) yarat."
+
+AF_INET: "İnternet adresi (IPv4) kullanacağım" demek.
+
+SOCK_STREAM: "Verileri TCP protokolüyle (güvenli ve sırayla) taşıyacağım" demek.
+Oluşturduğumuz bu sanal bağlantı ucunu s değişkenine kaydediyoruz.
+
+6. Kronometreyi Kurmak (s.settimeout(0.1))
+Eğer çaldığımız kapı duvarsa (kapalıysa) kod saatlerce beklemesin, donmasın diye "Maksimum 0.1 saniye bekle, cevap gelmezse geç" diyoruz.
+
+7. Kapıyı Çalmak (result = s.connect_ex((target, port)))
+Hata fırlatıp programı çökertmemesi için connect_ex kullanıyoruz.
+Peki içine neden hem target hem port koyduk? Çünkü bir binaya gitmek için hem binanın adresine (Hedef IP = target) hem de çalacağın dairenin numarasına (Kapı numarası = port) ihtiyacın vardır!
+Parantez içinde yan yana yazılan bu ikili yapıya (target, port) Python'da Demet (Tuple) denir. Demetler değiştirilemez listelerdir. IP ve Port'u bir demet olarak verip kapıyı çalıyoruz. connect_ex kapı açıksa bize 0 (sıfır) cevabını veriyor. Biz de bu sayıyı result adlı değişkene atıyoruz.
+
+8. Kapı Açıksa İçeri Bakmak (if result == 0:)
+Eğer dönen Değer (Value) 0 ise, o kapı (port) açık demektir! Hemen içeri sızıyoruz:
+service = COMMON_PORTS.get(port, "Unknown"): "Açık kapıyı bulduk ama bu kimin kapısı?" diyoruz. Hemen yukarıdaki telefon rehberimize (COMMON_PORTS sözlüğümüze) gidiyoruz. .get() metodu sözlüğün içinde arama yapar. "Bana bu port numarasının karşılığını ver, eğer sözlükte yoksa programı çökertme, onun yerine bana 'Unknown' (Bilinmeyen) yazısını ver" der.
+Sonra da print ile "Port şu anda açık, içerideki servis şudur" diye ekrana yazdırıyoruz.
+
+9. Kabloyu Çıkarıp Atmak (s.close())
+Nasıl ki dosyaları with open ile açıp işimiz bitince güvenle kapatıyorsak, internet bağlantılarını da işimiz bitince kapatmalıyız. Yoksa bilgisayarın hafızası açık kalan binlerce kablo yüzünden tıkanır. s.close() ile işi biten o s soketini kapatıyoruz.
+
+10. Şalteri İndirmek (if __name__ == "__main__":)
+Bu blok (eğer girintisini düzeltip en sola alırsan) kodun çalışmaya başladığı yerdir.
+
+input() fonksiyonu ile ekranda bir yazı çıkarıp kullanıcıdan (senden) klavyeyle bir şeyler yazmanı bekleriz.
+
+int() fonksiyonu, kullanıcının klavyeden girdiği "80" yazısını (metin) alır, matematikteki 80 sayısına (Integer - Tam Sayı) dönüştürür. Çünkü portlar sayıdır, metin değil.
+
+Son olarak scan_ports(target_ip, start_port, end_port) diyerek, kullanıcıdan aldığımız bu gerçek verileri Argüman (Argument) olarak fonksiyonumuza gönderiyor ve fabrikamızı çalıştırıyoruz!
